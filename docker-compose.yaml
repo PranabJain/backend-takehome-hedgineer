@@ -1,0 +1,19 @@
+services:
+  api:
+    build: .
+    environment:
+      - NO_PROXY=*.yahoo.com,*.stooq.com
+    container_name: index-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/data
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7
+    container_name: index-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]

@@ -1,0 +1,43 @@
+
+---
+
+# 2️⃣ **PRODUCTION_NOTES.md** (Scaling & Improvements)
+
+```markdown
+# Production & Scaling Recommendations
+
+## 1. Database & Storage
+- **SQLite → PostgreSQL/DuckDB** in production for concurrency safety.
+- Add **indexes** on `(date)` and `(symbol, date)` for faster queries.
+- Partition historical data by year/month to avoid giant tables.
+
+## 2. Data Acquisition
+- Switch Yahoo Finance fallback to **Polygon.io** or **IEX Cloud** for reliability.
+- Schedule ingestion with **cron / Airflow**.
+- Store raw source data in S3 for reproducibility.
+
+## 3. API Scaling
+- Deploy via **Uvicorn + Gunicorn workers** behind Nginx.
+- Enable **GZip** or **Brotli** compression for JSON endpoints.
+
+## 4. Caching Strategy
+- Current Redis TTL = 1 hour; consider fine-grained keys by date range.
+- Add cache invalidation immediately after `/build-index` runs.
+
+## 5. Observability
+- Add **Prometheus metrics** (request time, errors).
+- Enable structured logging to ELK stack.
+
+## 6. Fault Tolerance
+- Graceful degradation: if Redis down, API falls back to DB.
+- Retry logic in ingestion job to handle API rate limits.
+
+## 7. Security
+- Add API key auth for `/export-data` and `/build-index`.
+- Validate date ranges to avoid massive overfetches.
+
+## 8. Business Logic Enhancements
+- Dividends: adjust returns for dividends (total return index).
+- Corporate actions: handle splits/mergers automatically.
+- Alternative weighting (market cap, risk-weighted) in config.
+
