@@ -31,6 +31,20 @@ class ExportRequest(BaseModel):
 
 app = FastAPI(title="Equal-Weighted Top-100 Index API")
 
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",  
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,        
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 def startup() -> None:
@@ -60,7 +74,10 @@ def api_index_performance(
         if cached is not None:
             return cached
 
-        rows = get_index_performance(start_str, end_str)
+        import time
+        time.sleep(0.5)  # simulate heavy DB query
+        rows = get_index_performance(start_date, end_date)
+
         cache.set_json(cache_key, rows, 3600)
         return rows
     except Exception as e:

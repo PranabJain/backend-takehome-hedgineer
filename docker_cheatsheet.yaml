@@ -1,0 +1,85 @@
+🐳 Docker Cheat Sheet for Equal‑Weighted Index Project
+1. Build Images
+Build everything fresh
+docker compose build --no-cache
+Rebuilds all services in docker-compose.yml from scratch (ignores build cache).
+
+Build only the API service fresh
+docker compose build --no-cache api
+
+2. Start and Stop Containers
+Start services in the background
+docker compose up -d
+Starts containers as per docker-compose.yml in detached mode.
+
+Start in foreground to see logs
+docker compose up
+
+Stop and remove containers (but keep DB/cache)
+docker compose down
+
+3. One‑Off Commands Inside Containers
+Run data ingestion
+docker compose run --rm api python ingest.py
+--rm → remove container after the job
+Runs inside the api image with mounted volumes and environment
+
+4. Logs & Debugging
+View container logs
+docker compose logs api
+Follow logs live
+bash
+
+Copy
+
+docker compose logs -f api
+Press CTRL+C to stop following.
+
+5. Redis Cache Management
+Enter Redis CLI inside the container
+bash
+
+Copy
+
+docker exec -it index-redis redis-cli
+(index-redis = container name from docker-compose.yml)
+
+List all keys
+txt
+
+Copy
+
+keys *
+Delete a specific key
+txt
+
+Copy
+
+del perf:2025-05-12:2025-09-12
+6. Docker Space Cleanup
+Remove unused containers/images/networks/volumes
+bash
+
+Copy
+
+docker system prune -af --volumes
+⚠ Deletes everything not currently running.
+
+7. Full Example Session
+bash
+
+Copy
+
+# 1. Build API image fresh
+docker compose build --no-cache api
+
+# 2. Start API + Redis
+docker compose up -d
+
+# 3. Ingest market data
+docker compose run --rm api python ingest.py
+
+# 4. Call APIs (build-index, index-performance, export-data...)
+
+# 5. Stop containers (keep data)
+docker compose down

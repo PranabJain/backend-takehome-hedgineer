@@ -39,7 +39,6 @@ Because top 100 by market cap can change, we track which stocks enter or exit co
 - Changes: “Show which stocks swapped in or out compared to the prior trading day.”
 - Export: “Give me an Excel with performance, compositions, and changes so I can share.”
 
-### 10) How to Present This in a Hackathon
 - Start with the story: “We built an index that rebalances daily to the top 100 by size, but we give each stock equal representation.”
 - Emphasize data engineering: robust ingestion with fallbacks, SQL-first modeling, and clean APIs.
 - Show the Excel export and the composition changes to demonstrate practical insights.

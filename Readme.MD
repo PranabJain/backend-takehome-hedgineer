@@ -28,7 +28,7 @@ Returns JSON to frontend or Excel to analysts.
 
 ### 2. **SQLite/DuckDB**
 - Stores prices, market caps, index compositions, and returns.
-- Lightweight, portable, perfect for hackathon speed.
+- Lightweight, portable, perfect for speed.
 
 ---
 
@@ -89,7 +89,7 @@ Returns JSON to frontend or Excel to analysts.
 **FastAPI** → modern, fast, self-documenting APIs.  
 **Docker** → same code runs everywhere without config drift.  
 **Redis** → faster repeated queries.  
-**SQLite/DuckDB** → easy to set up, no external DB needed for hackathon.  
+**SQLite/DuckDB** → easy to set up, no external DB needed.  
 
 ---
 

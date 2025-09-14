@@ -47,7 +47,7 @@ def fetch_sp500_symbols() -> pd.DataFrame:
             time.sleep(1.5 * (i + 1))
 
     # CSV fallback
-    csv_path = os.getenv("SP500_CSV") or "/codemill/jainpran/dig_2025_test/data/sp500_static.csv"
+    csv_path = os.getenv("SP500_CSV") or "sp500_static.csv"
     if os.path.exists(csv_path):
         try:
             df = pd.read_csv(csv_path)

@@ -1,7 +1,7 @@
 import requests
 
 BASE = "http://localhost:8000"
-start_date = "2025-05-12"
+start_date = "2025-01-12"
 end_date = "2025-09-12"
 
 # Build Index
