@@ -1,95 +1,152 @@
-# Presentation Notes — Technical & Business Explanation
+qual‑Weighted Top‑100 US Stocks Index Backend
+📌 Project Summary
+A backend service that tracks a custom equal‑weighted stock index of the top 100 US stocks by daily market capitalisation.
 
-## 📌 Project Summary
-We built a backend service to track a **custom equal-weighted stock index** of the **top 100 US stocks by market cap**.  
-The index is recalculated daily and can be exported for analysis.
+Selects the top 100 stocks by market cap each trading day.
+Assigns equal weights (1/100 each).
+Calculates daily and cumulative returns.
+Updates daily and stores results in a database.
+Exports data in JSON or well‑formatted Excel.
+💡 Why Equal‑Weighted?
+Market cap‑weighted indexes (e.g., S&P 500) are dominated by mega‑caps.
+Equal‑weighting gives each stock the same influence.
+Increases exposure to mid‑cap companies.
+Requires daily rebalancing as market caps change.
+🔹 Tech Stack
+FastAPI — API framework
+SQLite/DuckDB — persistent storage
+Redis — in‑memory cache to speed up repeated queries
+Docker + docker-compose — containerisation for consistent setup
+Pandas/Polars — data manipulation
+Yahoo Finance API / Synthetic data generator — price & market cap source
+XlsxWriter / OpenPyXL — Excel export
+🛠 Setup Instructions
+Local (no Docker)
+Clone the repo
 
----
+git clone <repo_url>
 
-## 💡 Why Equal-Weighted?
-In a **market cap-weighted index** (e.g., S&P 500), big companies dominate returns.  
-An equal-weighted index:
-- Gives **every constituent the same weight** (1/100 here).
-- Requires **daily rebalancing** because market caps shift.
+cd <repo_name>
 
----
+Create virtual environment
 
-## 🔹 Key Architecture Components
+python -m venv venv
 
-### 1. **FastAPI**
-- Modern async Python framework (type hints → API docs automatically).
-- High performance — comparable to Node/Go for JSON APIs.
+source venv/bin/activate      # Windows: venv\Scripts\activate
 
-**In our app:**  
-Handles `/build-index`, `/index-performance`, etc.  
-Returns JSON to frontend or Excel to analysts.
+Install dependencies
 
----
+pip install -r requirements.txt
 
-### 2. **SQLite/DuckDB**
-- Stores prices, market caps, index compositions, and returns.
-- Lightweight, portable, perfect for speed.
+Copy environment variables
 
----
+cp .env.example .env
 
-### 3. **Redis**
-- In-memory database for caching.
-- Reduces response time for repeated queries.
-- Example: `/index-performance` cache avoids recalculating SQL for the same period.
+Run ingestion job
 
----
+python ingest.py
 
-### 4. **Docker**
-- Encapsulates app + dependencies in a container.
-- Ensures panelists, devs, and prod environments are identical.
-- `docker-compose` runs:
-  - API service
-  - Redis instance
-  - Mounted volume for database
+Start FastAPI server
 
----
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-## 📈 Data Flow
+Docker Setup
+Build API image fresh
 
-1. **Ingestion job** (`ingest.py`):
-   - Fetches last ~6 months of market data via Yahoo Finance/Synthetic.
-   - Populates `daily_prices` and `daily_market_caps`.
+docker compose build --no-cache api
 
-2. **Index Building**:
-   - For each day in range:
-     - Pick top 100 by market cap.
-     - Assign equal weight = 1/100.
-     - Calculate daily & cumulative returns.
-     - Save to DB.
+Start API + Redis
 
-3. **API Access**:
-   - GET endpoints → return JSON.
-   - POST `/export-data` → generate Excel via Pandas + XlsxWriter.
+docker compose up -d
 
----
+Run ingestion inside container
 
-## 📊 Finance Terminology (for non-finance judges)
+docker compose run --rm api python ingest.py
 
-- **Market Capitalization** = Price × Shares Outstanding.
-- **Equal-Weighted Index** = Each stock has same proportional weight.
-- **Daily Return** = % change from previous day.
-- **Cumulative Return** = Compounded return over the period.
-- **Rebalance** = Adjusting portfolio weights back to target.
+📥 Data Acquisition Job
+Before using the index endpoints, load market data:
 
----
+docker compose run --rm api python ingest.py
 
-## 🚀 Why This Matters
-- Lets analysts compare **performance of equal-weighted strategy** to S&P 500.
-- Highlights **mid-cap and smaller large-cap** contributions vs mega-cap dominance.
-- Ready to integrate into a dashboard or trading backtest pipeline.
+📡 API Usage
+1. Build Index
 
----
+curl -X POST "http://localhost:8000/build-index"
 
-## ⚙️ Why These Technologies
-**FastAPI** → modern, fast, self-documenting APIs.  
-**Docker** → same code runs everywhere without config drift.  
-**Redis** → faster repeated queries.  
-**SQLite/DuckDB** → easy to set up, no external DB needed.  
+-H "Content-Type: application/json"
 
----
+-d '{"start_date":"2025-05-12","end_date":"2025-09-12"}'
 
+2. Get Index Performance
+
+curl "http://localhost:8000/index-performance?start_date=2025-05-12&end_date=2025-09-12"
+
+3. Get Composition for a Date
+
+curl "http://localhost:8000/index-composition?date=2025-09-12"
+
+4. Get Composition Changes
+
+curl "http://localhost:8000/composition-changes?start_date=2025-05-12&end_date=2025-09-12"
+
+5. Export Data (Excel)
+
+curl -X POST "http://localhost:8000/export-data"
+
+-H "Content-Type: application/json"
+
+-d '{"start_date":"2025-05-12","end_date":"2025-09-12"}'
+
+--output index_export.xlsx
+
+🗄 Database Schema
+stocks
+
+symbol (TEXT) — Stock ticker
+
+name (TEXT) — Company name
+
+sector (TEXT) — Sector classification
+
+industry (TEXT) — Industry classification
+
+exchange (TEXT) — Exchange
+
+daily_prices
+
+(symbol, date) — Primary key
+
+close (REAL)
+
+adj_close (REAL)
+
+volume (INTEGER)
+
+daily_market_caps
+
+(symbol, date) — Primary key
+
+market_cap (REAL)
+
+index_compositions
+
+(date, symbol) — Primary key
+
+weight (REAL)
+
+index_performance
+
+(date) — Primary key
+
+daily_return (REAL)
+
+cumulative_return (REAL)
+
+index_level (REAL)
+
+📊 Finance Terms
+Market Capitalisation = Price × Shares Outstanding
+Equal‑Weighted Index = All constituents get equal weight
+Daily Return = % change from previous day
+Cumulative Return = Compounded performance
+Rebalance = Adjusting holdings to target weights

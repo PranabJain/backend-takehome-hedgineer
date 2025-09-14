@@ -32,7 +32,7 @@ Because top 100 by market cap can change, we track which stocks enter or exit co
 - Survivorship bias: Using a current S&P 500 list for past periods can bias results. A production system would use point-in-time constituents.
 - Transaction costs and constraints: Real portfolios incur costs; equal-weight rebalancing is idealized here.
 
-### 9) API Summary (Plain English)
+### 9) API Summary 
 - Build Index: “Select top 100 by size, give equal weights, compute day’s return and update the index.”
 - Performance: “Show the daily and cumulative growth of the index.”
 - Composition: “Show which 100 stocks were in the index on a given day.”
