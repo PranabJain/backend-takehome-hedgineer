@@ -86,7 +86,6 @@ curl -X POST "http://localhost:8000/export-data" \
 -H "Content-Type: application/json" \
 -d '{"start_date":"2025-05-12","end_date":"2025-09-12"}' \
 --output index_export.xlsx
-```bash
 
 🗄 Database Schema
 stocks
@@ -144,4 +143,5 @@ Daily Return = % change from previous day
 Cumulative Return = Compounded performance
 
 Rebalance = Adjusting holdings to target weights
+
 
