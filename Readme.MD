@@ -32,7 +32,7 @@ A backend service that tracks a **custom equal-weighted stock index** of the top
 
 ## 🛠 Setup Instructions
 
-### Local (No Docker)
+### Docker Setup
 ```bash
 # Clone the repo
 git clone <repo_url>
@@ -48,13 +48,6 @@ pip install -r requirements.txt
 # Copy environment variables
 cp .env.example .env
 
-# Run ingestion job
-python ingest.py
-
-# Start FastAPI server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-
 Docker Setup
 # Build API image fresh
 docker compose build --no-cache api
@@ -64,6 +57,7 @@ docker compose up -d
 
 # Run ingestion inside container
 docker compose run --rm api python ingest.py
+```bash
 
 📥 Data Acquisition Job
 
@@ -71,6 +65,8 @@ Before using the index endpoints, load market data:
 docker compose run --rm api python ingest.py
 
 📡 API Usage
+```bash
+
 1. Build Index
 curl -X POST "http://localhost:8000/build-index" \
 -H "Content-Type: application/json" \
@@ -90,6 +86,7 @@ curl -X POST "http://localhost:8000/export-data" \
 -H "Content-Type: application/json" \
 -d '{"start_date":"2025-05-12","end_date":"2025-09-12"}' \
 --output index_export.xlsx
+```bash
 
 🗄 Database Schema
 stocks
@@ -147,3 +144,4 @@ Daily Return = % change from previous day
 Cumulative Return = Compounded performance
 
 Rebalance = Adjusting holdings to target weights
+
